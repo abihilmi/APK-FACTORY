@@ -22,7 +22,7 @@ on:
         type: string
 
       icon_file:
-        description: "Lokasi gambar ikon PNG, misalnya icons/ayoso.png"
+        description: "Lokasi gambar ikon PNG, misalnya icons/AYOSO.png"
         required: false
         default: ""
         type: string
