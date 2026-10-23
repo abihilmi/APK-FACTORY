@@ -34,6 +34,15 @@ jobs:
           sed -i 's#<application#<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <application#' android/app/src/main/AndroidManifest.xml
           npx cap sync android
 
+      - name: Pasang icon (jika ada AYOSO.png di repo)
+        run: |
+          if [ -f AYOSO.png ]; then
+            mkdir -p assets
+            convert AYOSO.png -resize 1024x1024 PNG32:assets/icon.png
+            npm install @capacitor/assets@3
+            npx capacitor-assets generate --android --iconBackgroundColor '#ffffff' --iconBackgroundColorDark '#ffffff'
+          fi
+
       - name: Bangun APK
         run: |
           cd android
