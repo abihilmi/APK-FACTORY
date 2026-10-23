@@ -44,8 +44,8 @@ jobs:
           if [ -n "$ICON" ]; then
             echo "Memakai icon: $ICON"
             mkdir -p assets
-            convert "$ICON" -resize 1024x1024 PNG32:assets/icon.png
-            npm install @capacitor/assets@3
+            npm install @capacitor/assets@3 sharp
+            node -e "require('sharp')(process.argv[1]).resize(1024,1024,{fit:'contain',background:{r:255,g:255,b:255,alpha:0}}).png().toFile('assets/icon.png').then(()=>console.log('Icon diperbesar ke 1024x1024'))" "$ICON"
             npx capacitor-assets generate --android --iconBackgroundColor '#ffffff' --iconBackgroundColorDark '#ffffff'
           else
             echo "Icon tidak ditemukan, memakai icon bawaan"
