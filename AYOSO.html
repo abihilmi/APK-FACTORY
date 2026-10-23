@@ -1,0 +1,1407 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; connect-src 'self' https://ipwho.is https://ipapi.co https://get.geojs.io https://api.bigdatacloud.net; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'" />
+  <meta name="referrer" content="no-referrer" />
+  <title>AYOSO - Ayo Sholat Berjama'ah</title>
+  <meta name="description" content="AYOSO (Ayo Sholat Berjama'ah) - Jam digital waktu sholat offline minimalis full color." />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #020617;
+      color: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 12px;
+      user-select: none;
+      -webkit-user-select: none;
+      text-align: center;
+    }
+    @media (min-width: 640px) { body { padding: 16px; } }
+    
+    /* Font Angka Simple, Jelas, & Kontras */
+    .font-digital {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-feature-settings: "tnum";
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 1px;
+    }
+
+    /* Top Toolbar */
+    .top-toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    @media (min-width: 640px) {
+      .top-toolbar { flex-direction: row; justify-content: space-between; align-items: center; }
+    }
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 12px;
+      border-radius: 14px;
+      background: rgba(6,78,59,0.85);
+      border: 1px solid rgba(16,185,129,0.5);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .brand-title {
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      color: #6ee7b7;
+      text-shadow: 0 0 12px rgba(52,211,153,0.6);
+    }
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    .btn-setting {
+      background: #059669;
+      color: #ffffff;
+      border: 1.5px solid rgba(52,211,153,0.8);
+      box-shadow: 0 4px 14px rgba(6,78,59,0.6);
+    }
+    .btn-setting:hover { background: #10b981; }
+    .btn-setting:active { transform: scale(0.96); }
+    .btn-secondary {
+      background: rgba(15,23,42,0.9);
+      color: #cbd5e1;
+      border-color: rgba(71,85,105,0.6);
+    }
+    .btn-secondary:hover { background: rgba(30,41,59,0.9); color: #fff; }
+
+    /* Header Card Display (Kompak & Proporsional) */
+    .header-box {
+      background: linear-gradient(180deg, rgba(15,23,42,0.95), rgba(6,78,59,0.35));
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: 18px;
+      padding: 12px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 10px 20px -5px rgba(0,0,0,0.5);
+      align-items: center;
+    }
+    @media (min-width: 768px) {
+      .header-box { flex-direction: row; justify-content: space-between; align-items: center; }
+    }
+    .flex-row { 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      gap: 8px; 
+      text-align: center;
+    }
+    @media (min-width: 768px) {
+      .flex-row { flex-direction: row; text-align: left; }
+    }
+    .badge-slogan {
+      background: rgba(6,78,59,0.7);
+      border: 1px solid rgba(16,185,129,0.5);
+      color: #6ee7b7;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .dot-pulse {
+      width: 5px; height: 5px; border-radius: 50%; background: #34d399;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .date-container { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+    @media (min-width: 768px) {
+      .date-container { align-items: flex-end; }
+    }
+    .badge-hijri {
+      background: rgba(6,78,59,0.7);
+      border: 1px solid rgba(16,185,129,0.6);
+      color: #6ee7b7;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-masehi {
+      background: rgba(30,41,59,0.7);
+      border: 1px solid rgba(71,85,105,0.6);
+      color: #cbd5e1;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 10px;
+    }
+
+    /* Big Clock (Proporsional, Rapi, Kontras Tinggi) */
+    .clock-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      margin: 14px 0;
+    }
+    @media (min-width: 900px) {
+      .clock-section { flex-direction: row; justify-content: center; gap: 35px; }
+    }
+    .big-clock {
+      display: flex;
+      align-items: baseline;
+      font-size: 56px;
+      font-weight: 800;
+      color: #ffffff;
+      text-shadow: 0 0 20px rgba(52, 211, 153, 0.4);
+      justify-content: center;
+    }
+    @media (min-width: 600px) {
+      .big-clock { font-size: 76px; }
+    }
+    .colon { color: #34d399; animation: pulse 1s infinite; margin: 0 4px; }
+    .seconds-box {
+      background: rgba(6,78,59,0.85);
+      border: 1.5px solid #34d399;
+      color: #6ee7b7;
+      padding: 4px 10px;
+      border-radius: 10px;
+      font-size: 22px;
+      font-weight: 700;
+      margin-left: 10px;
+    }
+    .countdown-card {
+      background: linear-gradient(135deg, rgba(30,41,59,0.95), rgba(6,78,59,0.8));
+      border: 1px solid rgba(16,185,129,0.5);
+      border-radius: 14px;
+      padding: 12px 18px;
+      text-align: center;
+      min-width: 240px;
+      box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+    }
+
+    /* 6 Prayer Cards */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin: 10px 0;
+    }
+    @media (min-width: 640px) {
+      .cards-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (min-width: 1024px) {
+      .cards-grid { grid-template-columns: repeat(6, 1fr); }
+    }
+    .prayer-card {
+      background: rgba(15,23,42,0.85);
+      border: 1px solid rgba(51,65,85,0.8);
+      border-radius: 12px;
+      padding: 10px;
+      text-align: center;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .prayer-card.active-next {
+      background: linear-gradient(180deg, rgba(6,78,59,0.95), rgba(15,23,42,0.95));
+      border: 2px solid #34d399;
+      box-shadow: 0 6px 16px rgba(16,185,129,0.4);
+      transform: translateY(-2px);
+    }
+    .card-title { font-size: 11px; font-weight: 800; letter-spacing: 1px; color: #34d399; }
+    .card-time { font-size: 24px; font-weight: 700; margin: 4px 0; color: #fff; }
+    .card-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: rgba(52,211,153,0.2); color: #34d399; display: inline-block; }
+
+    /* Running Text (Pelan & Santai, Hadits Sholat Berjamaah) */
+    .marquee-container {
+      background: rgba(15,23,42,0.95);
+      border: 1px solid rgba(16,185,129,0.3);
+      border-radius: 12px;
+      padding: 8px 12px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      text-align: left;
+    }
+    .marquee-track {
+      overflow: hidden;
+      white-space: nowrap;
+      width: 100%;
+    }
+    .marquee-content {
+      display: inline-block;
+      white-space: nowrap;
+      animation: marquee 240s linear infinite;
+      font-size: 13px;
+      color: #cbd5e1;
+      font-weight: 500;
+    }
+    .marquee-content:hover { animation-play-state: paused; }
+    @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+    /* Footer */
+    .footer-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 8px;
+      font-size: 10px;
+      color: #94a3b8;
+      border-top: 1px solid rgba(51,65,85,0.6);
+      margin-top: 8px;
+    }
+
+    /* Modal Dialogs */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-card {
+      background: #0f172a;
+      border: 1px solid rgba(16,185,129,0.4);
+      border-radius: 24px;
+      max-width: 520px;
+      width: 100%;
+      padding: 24px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
+      text-align: left;
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 12px;
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      background: #020617;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+    }
+    .form-input:focus { border-color: #10b981; }
+    .close-btn {
+      background: #1e293b;
+      border: none;
+      color: #94a3b8;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    /* Toast Notification */
+    #toast-msg {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #059669;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 14px;
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      z-index: 200;
+      display: none;
+      border: 1px solid #34d399;
+    }
+
+
+    /* Header branding refinement */
+    .brand-pill { gap:12px; padding:10px 16px; flex-wrap:nowrap; }
+    .brand-title { font-size:clamp(23px,3.2vw,30px); color:#ffffff; letter-spacing:1.8px; text-shadow:0 1px 8px rgba(0,0,0,.35); }
+    .brand-descriptor { display:inline-block; color:#ecfdf5; font-size:clamp(12px,1.8vw,16px); font-weight:800; letter-spacing:.15px; white-space:nowrap; padding-left:12px; border-left:1px solid rgba(209,250,229,.55); }
+    .header-box .flex-row { flex-direction:row; align-items:center; justify-content:flex-start; text-align:left; gap:15px; width:100%; }
+    .header-box .flex-row > div { min-width:0; }
+    .header-box .flex-row svg { width:clamp(58px,7vw,76px); height:clamp(58px,7vw,76px); }
+    #disp-mosque { overflow-wrap:anywhere; }
+    @media (max-width:420px) { .brand-pill { gap:8px; padding:9px 10px; } .brand-descriptor { font-size:11px; padding-left:8px; } .brand-title { font-size:22px; letter-spacing:1px; } .header-box .flex-row { gap:10px; } .header-box .flex-row svg { width:54px; height:54px; } }
+
+    /* AYOSO modern polish: refined color, spacing, hierarchy and responsive layout */
+    :root { color-scheme: dark; --mint:#6ee7b7; --teal:#14b8a6; --blue:#60a5fa; --gold:#fbbf24; --panel:rgba(12,25,43,.88); }
+    body {
+      position:relative; isolation:isolate; overflow-x:hidden; gap:14px;
+      padding:clamp(12px,2.2vw,28px);
+      background:radial-gradient(ellipse at 8% 0%,rgba(20,184,166,.18),transparent 32%),
+                 radial-gradient(ellipse at 100% 18%,rgba(59,130,246,.16),transparent 30%),
+                 linear-gradient(145deg,#06101e 0%,#0b1728 48%,#071426 100%);
+    }
+    body::before { content:""; position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:.18;
+      background-image:radial-gradient(rgba(148,163,184,.3) .7px,transparent .7px); background-size:19px 19px; }
+    .top-toolbar { gap:10px; margin-bottom:0; }
+    .brand-pill { padding:9px 15px; border-radius:15px; background:linear-gradient(135deg,rgba(6,95,70,.95),rgba(13,148,136,.72)); border:1px solid rgba(110,231,183,.5); box-shadow:0 8px 24px rgba(2,6,23,.3),inset 0 1px rgba(255,255,255,.08); }
+    .brand-title { font-size:clamp(20px,3vw,26px); letter-spacing:2px; color:#d1fae5; text-shadow:none; }
+    .btn { min-height:34px; padding:8px 12px; border-radius:11px; font-size:12px; transition:transform .18s ease,background .18s ease,border-color .18s ease; }
+    .btn:hover { transform:translateY(-1px); }
+    .btn-setting { background:linear-gradient(135deg,#059669,#0d9488); border:1px solid rgba(167,243,208,.65); box-shadow:0 5px 15px rgba(5,150,105,.22); }
+    .btn-secondary { background:rgba(15,31,51,.86); border-color:rgba(100,116,139,.4); }
+    .header-box { position:relative; overflow:hidden; gap:14px; padding:clamp(14px,2vw,22px); border-radius:22px;
+      background:linear-gradient(115deg,rgba(12,35,51,.96),rgba(10,44,54,.88) 54%,rgba(15,35,65,.94));
+      border:1px solid rgba(94,234,212,.28); box-shadow:0 16px 36px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.06); }
+    .header-box::after { content:""; position:absolute; width:190px;height:190px;right:-90px;top:-115px;border-radius:50%;background:rgba(45,212,191,.12);pointer-events:none; }
+    .flex-row { gap:12px; }
+    .flex-row svg { flex:0 0 auto; filter:drop-shadow(0 5px 10px rgba(16,185,129,.18)); }
+    #disp-mosque { font-size:clamp(18px,2.5vw,25px)!important; letter-spacing:-.45px; }
+    #disp-city { color:#5eead4!important; font-size:12px!important; }
+    .badge-slogan { background:rgba(13,148,136,.16); border-color:rgba(94,234,212,.34); color:#ccfbf1; padding:5px 9px; font-size:10px; letter-spacing:.15px; }
+    .badge-hijri { background:linear-gradient(135deg,rgba(5,150,105,.2),rgba(13,148,136,.15)); border-color:rgba(110,231,183,.35); color:#a7f3d0; }
+    .badge-masehi { background:rgba(30,41,59,.6); border-color:rgba(148,163,184,.22); }
+    .clock-section { gap:clamp(14px,3vw,36px); margin:4px 0; }
+    .big-clock { font-size:clamp(58px,10vw,104px); line-height:1; letter-spacing:-2px; text-shadow:0 0 34px rgba(45,212,191,.2); }
+    .colon { color:#5eead4; margin:0 2px; }
+    .seconds-box { background:linear-gradient(145deg,rgba(6,95,70,.8),rgba(15,118,110,.58)); border-color:rgba(94,234,212,.65); color:#ccfbf1; font-size:clamp(17px,2.2vw,24px); padding:6px 10px; margin-left:9px; }
+    .countdown-card { min-width:min(255px,90vw); padding:15px 22px; border-radius:18px; background:linear-gradient(135deg,rgba(13,38,54,.96),rgba(10,71,70,.78)); border:1px solid rgba(45,212,191,.38); box-shadow:0 12px 26px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.05); }
+    #disp-next-name { color:#99f6e4!important; }
+    #disp-countdown { letter-spacing:1.5px; }
+    .cards-grid { gap:clamp(8px,1.25vw,14px); margin:0; }
+    .prayer-card { position:relative; overflow:hidden; padding:clamp(12px,1.6vw,18px) 8px; border-radius:16px; background:linear-gradient(155deg,rgba(18,34,55,.96),rgba(10,24,42,.92)); border:1px solid rgba(100,116,139,.24); box-shadow:0 7px 18px rgba(0,0,0,.13); }
+    .prayer-card::before { content:""; position:absolute; top:0;left:18%;right:18%;height:2px;background:linear-gradient(90deg,transparent,rgba(94,234,212,.45),transparent); }
+    .prayer-card.active-next { background:linear-gradient(155deg,rgba(6,95,70,.82),rgba(10,36,51,.98)); border:1px solid rgba(94,234,212,.85); box-shadow:0 8px 24px rgba(16,185,129,.17),inset 0 0 0 1px rgba(255,255,255,.03); transform:translateY(-2px); }
+    .card-title { color:#5eead4; font-size:11px; letter-spacing:1.4px; }
+    .card-time { font-size:clamp(22px,3vw,29px); letter-spacing:-.5px; }
+    .card-badge { background:rgba(45,212,191,.13); color:#99f6e4; border-radius:6px; padding:3px 7px; }
+    .marquee-container { position:relative; gap:10px; padding:0; min-height:52px; border-radius:15px; overflow:hidden; text-align:left;
+      background:linear-gradient(100deg,rgba(8,47,55,.98),rgba(11,27,47,.98) 55%,rgba(20,48,75,.98));
+      border:1px solid rgba(94,234,212,.32); box-shadow:0 8px 20px rgba(0,0,0,.16),inset 0 1px rgba(255,255,255,.04); }
+    .marquee-label { flex:0 0 auto; align-self:stretch; display:flex; align-items:center; gap:7px; padding:0 14px; color:#062b2b; font-size:10px; font-weight:900; letter-spacing:1px; text-transform:uppercase; background:linear-gradient(135deg,#6ee7b7,#2dd4bf); box-shadow:5px 0 15px rgba(0,0,0,.12); z-index:1; }
+    .marquee-label .label-icon { font-size:15px; }
+    .marquee-track { min-width:0; flex:1; overflow:hidden; white-space:nowrap; }
+    .marquee-content { display:flex; width:max-content; white-space:nowrap; animation:marqueeLoop 150s linear infinite; font-size:clamp(12px,1.4vw,14px); color:#e2e8f0; font-weight:500; will-change:transform; }
+    .marquee-content .marquee-copy { display:inline-flex; align-items:center; flex:0 0 auto; padding-right:34px; }
+    .marquee-content .marquee-copy span { display:inline-block; padding:0 13px; }
+    .marquee-content .marquee-copy b { color:#5eead4; font-weight:800; }
+    .marquee-content:hover { animation-play-state:paused; }
+    @keyframes marqueeLoop { from { transform:translateX(0); } to { transform:translateX(-50%); } }
+    .footer-bar { flex-wrap:wrap; gap:6px 12px; padding:12px 4px 2px; font-size:11px; border-top:1px solid rgba(100,116,139,.22); margin-top:0; }
+    .footer-bar > div:last-child { color:#5eead4!important; }
+    .modal-card { background:linear-gradient(145deg,#102136,#0b1728); border-color:rgba(45,212,191,.3); }
+    .form-input { background:#071426; border-color:#334b61; }
+    #toast-msg { background:linear-gradient(135deg,#059669,#0f766e); border-color:rgba(167,243,208,.55); }
+    @media (max-width:639px) {
+      body { gap:12px; padding:10px; }
+      .top-toolbar > div:first-child { gap:8px; }
+      .top-toolbar > div:first-child > div:first-child { min-width:0; }
+      .btn-group { gap:6px; }
+      .btn { font-size:11px; padding:7px 9px; }
+      .header-box { border-radius:18px; }
+      .date-container { flex-direction:row; flex-wrap:wrap; justify-content:center; }
+      .clock-section { gap:12px; }
+      .countdown-card { min-width:0; width:100%; max-width:340px; }
+      .cards-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+      .marquee-label { padding:0 10px; font-size:9px; }
+      .footer-bar { justify-content:center; text-align:center; }
+    }
+    @media (min-width:640px) and (max-width:899px) { .big-clock { font-size:74px; } .countdown-card { min-width:220px; } }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; animation-iteration-count:1!important; scroll-behavior:auto!important; transition-duration:.01ms!important; } }
+
+    /* Penyelarasan header identitas masjid: tiga baris teks sejajar dan ikon seimbang */
+    .header-box .flex-row { align-items:center; gap:14px; }
+    .header-box .flex-row > svg { margin-left:8px; flex:0 0 auto; }
+    .header-box .flex-row > div { margin-left:8px; min-width:0; text-align:left; }
+    #disp-mosque { text-align:left; margin:0; }
+    .header-box .flex-row > div > div:last-child {
+      display:flex!important; flex-direction:column!important; align-items:flex-start!important;
+      justify-content:flex-start!important; gap:5px!important; margin-top:5px!important;
+    }
+    .header-box .flex-row > div > div:last-child > span:nth-child(2) { display:none!important; }
+    #disp-city { display:block; text-align:left; }
+    .badge-slogan { display:inline-flex; align-items:center; width:max-content; max-width:100%; box-sizing:border-box; text-align:left; white-space:normal; }
+    @media (max-width:420px) {
+      .header-box .flex-row { gap:10px; }
+      .header-box .flex-row > svg { margin-left:6px; }
+      .header-box .flex-row > div { margin-left:4px; }
+      #disp-mosque { font-size:clamp(17px,5vw,22px)!important; }
+      .badge-slogan { font-size:9px; padding:5px 7px; }
+    }
+
+    /* ===== v166: Tombol Out, dialog, lokasi ===== */
+    .btn-danger { background:linear-gradient(135deg,#b91c1c,#991b1b); color:#fff; border:1px solid rgba(252,165,165,.55); box-shadow:0 4px 12px rgba(127,29,29,.5); }
+    .btn-danger:hover { background:linear-gradient(135deg,#dc2626,#b91c1c); }
+    .btn-danger:active { transform:scale(.96); }
+    .btn:disabled { opacity:.6; cursor:wait; }
+    #modal-dialog { z-index:200; }
+    #modal-dialog .modal-card { max-width:440px; }
+    .dlg-title { font-size:17px; font-weight:800; color:#fff; margin-bottom:10px; }
+    .dlg-body { font-size:13px; line-height:1.6; color:#cbd5e1; }
+    .dlg-body ul { margin:8px 0 0 18px; }
+    .dlg-body li { margin-bottom:4px; }
+    .dlg-actions { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; margin-top:18px; }
+    .dlg-actions .btn { padding:9px 16px; font-size:12px; }
+    .loc-status { background:rgba(6,78,59,.35); border:1px solid rgba(52,211,153,.35); border-radius:10px; padding:9px 12px; font-size:12px; color:#a7f3d0; line-height:1.5; margin-bottom:10px; word-break:break-word; }
+    .loc-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .loc-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+    .form-hint { font-size:10.5px; color:#94a3b8; margin-top:5px; line-height:1.45; }
+    #exit-screen { position:fixed; inset:0; z-index:300; background:#000; display:none; flex-direction:column; align-items:center; justify-content:center; gap:14px; padding:24px; text-align:center; }
+    #exit-screen .ex-title { font-size:24px; font-weight:900; color:#6ee7b7; letter-spacing:1.5px; }
+    #exit-screen .ex-text { font-size:13px; color:#94a3b8; max-width:340px; line-height:1.6; }
+
+      /* v167: tombol Out = garis tepi oranye, tanpa isi merah */
+    .btn-danger, .btn-danger:hover { background:transparent; color:#fb923c; border:1.5px solid #f97316; box-shadow:none; font-weight:600; }
+    .btn-danger:hover { background:rgba(249,115,22,.12); }
+    .btn-danger:active { transform:scale(.96); }
+  
+    /* ===== v168: header selebar layar, dot diam, dialog keluar elegan ===== */
+    .top-toolbar { display:flex !important; flex-direction:column !important; align-items:stretch !important; gap:10px; }
+    .brand-pill { display:flex !important; width:100%; box-sizing:border-box; justify-content:flex-start; align-items:center; text-align:left; }
+    .top-toolbar .btn-group { width:100%; }
+    @media (max-width:639px) {
+      .top-toolbar .btn-group { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); }
+      .top-toolbar .btn-group .btn { justify-content:center; padding-left:4px; padding-right:4px; white-space:nowrap; }
+    }
+    @media (min-width:640px) { .top-toolbar .btn-group { justify-content:flex-start; } }
+
+    .dot-pulse { animation:none !important; opacity:1 !important; }
+
+    .exit-overlay { position:fixed; inset:0; z-index:300; display:none; align-items:center; justify-content:center; padding:18px;
+      background:rgba(3,10,20,.78); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); }
+    .exit-overlay.show { display:flex; animation:exitFade .22s ease both; }
+    @keyframes exitFade { from{opacity:0} to{opacity:1} }
+    @keyframes exitRise { from{opacity:0; transform:translateY(12px) scale(.97)} to{opacity:1; transform:none} }
+    .exit-card { width:100%; max-width:340px; box-sizing:border-box; text-align:center; padding:26px 22px 20px; border-radius:22px;
+      background:linear-gradient(150deg,#102a3a,#0b1728 70%); border:1px solid rgba(94,234,212,.35);
+      box-shadow:0 24px 60px rgba(0,0,0,.55), inset 0 1px rgba(255,255,255,.08); animation:exitRise .28s ease both; }
+    .exit-icon { width:54px; height:54px; margin:0 auto 14px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+      font-size:24px; color:#fb923c; background:rgba(249,115,22,.12); border:1px solid rgba(249,115,22,.55); }
+    .exit-title { font-size:18px; font-weight:800; color:#fff; letter-spacing:.2px; margin:0 0 6px; }
+    .exit-text { font-size:13px; line-height:1.55; color:#a7c4cf; margin:0 0 20px; }
+    .exit-text b { color:#e2e8f0; }
+    .exit-actions { display:flex; gap:10px; }
+    .exit-actions button { flex:1; min-height:42px; border-radius:12px; font-size:14px; font-weight:800; cursor:pointer; font-family:inherit; transition:transform .15s ease, filter .15s ease; }
+    .exit-actions button:hover { filter:brightness(1.12); }
+    .exit-actions button:active { transform:scale(.97); }
+    .exit-no { background:linear-gradient(135deg,#059669,#0d9488); color:#fff; border:1px solid rgba(167,243,208,.6); box-shadow:0 6px 16px rgba(5,150,105,.28); }
+    .exit-yes { background:transparent; color:#fb923c; border:1.5px solid #f97316; }
+  
+    /* ===== v169: kotak header lebih ringkas, slogan lebih lega, dialog keluar profesional ===== */
+    .brand-pill { padding:6px 14px !important; gap:10px !important; border-radius:13px !important; }
+    .brand-title { font-size:clamp(16px,2.3vw,20px) !important; letter-spacing:2.2px !important; }
+    .brand-descriptor { font-size:clamp(10px,1.4vw,12px) !important; font-weight:600 !important; padding-left:10px !important; }
+    .brand-pill .dot-pulse { width:6px; height:6px; }
+    .top-toolbar { gap:8px !important; }
+
+    .badge-slogan { font-size:12.5px !important; letter-spacing:1.3px !important; word-spacing:2px; font-weight:700 !important;
+      padding:8px 16px !important; border-radius:10px !important; gap:9px !important; }
+    @media (max-width:420px) { .badge-slogan { font-size:11px !important; letter-spacing:.9px !important; padding:7px 11px !important; } }
+
+    .exit-overlay { background:rgba(2,8,18,.82); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+    .exit-card { position:relative; max-width:330px; padding:30px 24px 22px; border-radius:20px; overflow:hidden;
+      background:linear-gradient(165deg,#0f2536 0%,#0a1625 100%);
+      border:1px solid rgba(148,163,184,.22);
+      box-shadow:0 30px 70px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.03), inset 0 1px rgba(255,255,255,.06); }
+    .exit-card::before { content:""; position:absolute; left:0; right:0; top:0; height:3px;
+      background:linear-gradient(90deg,transparent,#34d399 25%,#2dd4bf 50%,#fbbf24 75%,transparent); }
+    .exit-icon { width:56px; height:56px; margin:0 auto 16px; font-size:22px; color:#5eead4;
+      background:radial-gradient(circle at 30% 25%,rgba(45,212,191,.22),rgba(15,37,54,.9));
+      border:1px solid rgba(94,234,212,.4); box-shadow:0 0 0 6px rgba(45,212,191,.07); }
+    .exit-title { font-size:17px; font-weight:800; letter-spacing:.3px; color:#f8fafc; margin:0 0 8px; }
+    .exit-text { font-size:12.5px; line-height:1.65; color:#94a9b8; margin:0 0 24px; padding:0 4px; }
+    .exit-text b { color:#cbd5e1; font-weight:700; }
+    .exit-actions { gap:10px; }
+    .exit-actions button { min-height:44px; border-radius:12px; font-size:13.5px; font-weight:700; letter-spacing:.4px; }
+    .exit-no { background:rgba(30,48,66,.85) !important; color:#d1fae5 !important; border:1px solid rgba(148,163,184,.3) !important; box-shadow:none !important; }
+    .exit-yes { background:linear-gradient(135deg,#059669,#0d9488) !important; color:#fff !important; border:1px solid rgba(167,243,208,.55) !important; box-shadow:0 8px 20px rgba(5,150,105,.3) !important; }
+  </style>
+</head>
+<body>
+  <!-- Top Toolbar -->
+  <header class="top-toolbar">
+    <div class="brand-pill">
+      <span class="dot-pulse"></span>
+      <span class="brand-title">AYOSO</span>
+      <span class="brand-descriptor">Ayo Sholat Berjamaah</span>
+    </div>
+
+    <!-- Tombol Fitur Pendukung -->
+    <div class="btn-group">
+      <button class="btn btn-secondary" onclick="syncGps()">
+        🧭 Sinkron GPS
+      </button>
+      <button class="btn btn-secondary" id="btn-sound" onclick="toggleSound()">
+        🔊 Suara
+      </button>
+      <button class="btn btn-setting" onclick="openSettingModal()" title="Buka Setting (Ubah Nama Masjid, Kota, Slogan, dan Jadwal)">
+        ⚙️ Setting
+      </button>
+      <button class="btn btn-danger" id="btn-exit" onclick="exitApp()" title="Keluar dari aplikasi AYOSO">
+        ⏻ Out
+      </button>
+    </div>
+  </header>
+
+  <!-- Header Card Display -->
+  <div class="header-box">
+    <div class="flex-row">
+      <!-- Kubah Masjid Hijau SVG -->
+      <svg width="68" height="68" viewBox="0 0 100 100" fill="none">
+        <circle cx="50" cy="50" r="44" stroke="#059669" stroke-width="1.5" />
+        <circle cx="50" cy="50" r="40" fill="#022c22" />
+        <rect x="25" y="65" width="50" height="11" rx="1.5" fill="#064e3b" stroke="#10b981" stroke-width="1" />
+        <path d="M 45 76 L 45 68 Q 50 63 55 68 L 55 76 Z" fill="#ca8a04" />
+        <rect x="18" y="44" width="6" height="32" rx="1" fill="#047857" />
+        <path d="M 16 44 L 26 44 L 21 34 Z" fill="#ca8a04" />
+        <rect x="76" y="44" width="6" height="32" rx="1" fill="#047857" />
+        <path d="M 74 44 L 84 44 L 79 34 Z" fill="#ca8a04" />
+        <path d="M 28 65 C 28 47 38 35 50 25 C 62 35 72 47 72 65 Z" fill="#059669" stroke="#34d399" stroke-width="1.2" />
+        <circle cx="50" cy="18" r="1.8" fill="#eab308" />
+        <line x1="50" y1="20" x2="50" y2="12" stroke="#eab308" stroke-width="1.5" stroke-linecap="round" />
+        <path d="M 52.5 10 C 51.2 10.3 50.2 11.5 50.2 13 C 50.2 14.7 51.5 16 53.2 16 C 53.7 16 54.2 15.9 54.6 15.6 C 53.6 16.5 52.3 17 50.9 17 C 48.7 17 47 15.2 47 13 C 47 11 48.5 9.3 50.5 9 C 51.2 8.9 51.9 9 52.5 9.3 Z" fill="#eab308" />
+      </svg>
+      <div>
+        <div>
+          <h1 style="font-size: clamp(22px, 3vw, 30px); line-height: 1.15; font-weight: 900; color: #ffffff; letter-spacing: .2px; text-shadow: 0 2px 12px rgba(0,0,0,.4);" id="disp-mosque">HANANA House</h1>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px; margin-top: 2px;">
+          <span style="color: #34d399; font-weight: 600; font-size: 11px;" id="disp-city">📍 Tedoria City</span>
+          <span style="color: #475569;">•</span>
+          <div class="badge-slogan">
+            <span class="dot-pulse"></span>
+            <span id="disp-slogan">SHOLAT Berjama'ah Setiap Waktu</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kalender: Hijriah di Atas Masehi -->
+    <div class="date-container">
+      <div class="badge-hijri" id="disp-hijri">Memuat Hijriah...</div>
+      <div class="badge-masehi" id="disp-masehi">Memuat Masehi...</div>
+    </div>
+  </div>
+
+  <!-- Big Clock Section (Proporsional & Simple) -->
+  <div class="clock-section">
+    <div style="display: flex; align-items: baseline; justify-content: center;">
+      <div class="big-clock font-digital">
+        <span id="disp-h">00</span>
+        <span class="colon">:</span>
+        <span id="disp-m">00</span>
+      </div>
+      <div class="seconds-box font-digital" id="disp-s">00</div>
+    </div>
+
+    <!-- Countdown Card -->
+    <div class="countdown-card">
+      <div style="font-size: 10px; text-transform: uppercase; color: #94a3b8; letter-spacing: 1px;">Menuju Waktu Sholat</div>
+      <div style="font-size: 16px; font-weight: 800; color: #34d399; margin: 3px 0;" id="disp-next-name">MEMUAT...</div>
+      <div class="font-digital" style="font-size: 22px; font-weight: 700; color: #fff;" id="disp-countdown">00:00:00</div>
+    </div>
+  </div>
+
+  <!-- 6 Prayer Cards -->
+  <div class="cards-grid" id="prayer-cards-container">
+    <div class="prayer-card"><div class="card-title">SUBUH</div><div class="card-time font-digital">04:22</div><div class="card-badge">WIB</div></div>
+    <div class="prayer-card"><div class="card-title">SYURUQ</div><div class="card-time font-digital">05:38</div><div class="card-badge">WIB</div></div>
+    <div class="prayer-card"><div class="card-title">DZUHUR</div><div class="card-time font-digital">11:48</div><div class="card-badge">WIB</div></div>
+    <div class="prayer-card"><div class="card-title">ASHAR</div><div class="card-time font-digital">15:02</div><div class="card-badge">WIB</div></div>
+    <div class="prayer-card"><div class="card-title">MAGHRIB</div><div class="card-time font-digital">17:54</div><div class="card-badge">WIB</div></div>
+    <div class="prayer-card"><div class="card-title">ISYA</div><div class="card-time font-digital">19:04</div><div class="card-badge">WIB</div></div>
+  </div>
+
+  <!-- Running Text: Hadits Sholat Berjama'ah (Kecepatan Pelan & Santai) -->
+  <div>
+    <div class="marquee-container" aria-label="Hadits tentang sholat berjamaah">
+      <div class="marquee-label"><span class="label-icon">☪</span><span>Hadits Pilihan</span></div>
+      <div class="marquee-track">
+        <div class="marquee-content" id="disp-hadith" aria-live="off"></div>
+      </div>
+    </div>
+
+    <!-- Footer Bar -->
+    <div class="footer-bar">
+      <div>
+        <strong style="color: #34d399;">AYOSO</strong> Ayo Sholat Berjamaah
+      </div>
+      <div style="color: #34d399; font-weight: 700;">
+        AH Creativa - 081316145365
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Element -->
+  <div id="toast-msg">Pengaturan berhasil disimpan!</div>
+
+  <!-- MODAL: SETTING LENGKAP -->
+  <div class="modal-backdrop" id="modal-setting">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 style="font-size: 18px; font-weight: 800; color: #fff;">⚙️ Setting AYOSO</h3>
+        <button class="close-btn" onclick="closeSettingModal()">✕</button>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nama Masjid / Musholla / Display:</label>
+        <input type="text" id="inp-mosque" class="form-input" placeholder="Contoh: HANANA House" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Nama Kota / Area Display:</label>
+        <input type="text" id="inp-city" class="form-input" placeholder="Contoh: Tedoria City" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Slogan Display:</label>
+        <input type="text" id="inp-slogan" class="form-input" placeholder="Contoh: SHOLAT Berjama'ah Setiap Waktu" />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Pilih Preset Kota Jadwal Sholat:</label>
+        <select id="inp-preset" class="form-input" onchange="applyPreset(this.value)">
+          <option value="custom">Lokasi saat ini (GPS / manual)</option>
+          <option value="cirebon">Cirebon (Default)</option>
+          <option value="jakarta">DKI Jakarta</option>
+          <option value="bandung">Kota Bandung</option>
+          <option value="semarang">Kota Semarang</option>
+          <option value="surabaya">Kota Surabaya</option>
+          <option value="yogyakarta">D.I. Yogyakarta</option>
+          <option value="medan">Kota Medan</option>
+          <option value="makassar">Kota Makassar</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="padding-top: 8px; border-top: 1px solid #1e293b;">
+        <label class="form-label">📍 Lokasi Jadwal Sholat Aktif:</label>
+        <div class="loc-status" id="loc-status">Memuat lokasi...</div>
+        <div class="loc-grid">
+          <div>
+            <label class="form-label" for="inp-lat">Lintang (Latitude):</label>
+            <input type="text" inputmode="decimal" id="inp-lat" class="form-input" placeholder="-6.7077" />
+          </div>
+          <div>
+            <label class="form-label" for="inp-lon">Bujur (Longitude):</label>
+            <input type="text" inputmode="decimal" id="inp-lon" class="form-input" placeholder="108.43" />
+          </div>
+        </div>
+        <div style="margin-top: 10px;">
+          <label class="form-label" for="inp-tz">Zona Waktu:</label>
+          <select id="inp-tz" class="form-input"></select>
+        </div>
+        <div class="loc-actions">
+          <button class="btn btn-secondary" style="padding: 8px 12px;" onclick="syncGps()">🧭 Sinkron GPS</button>
+          <button class="btn btn-setting" style="padding: 8px 12px;" onclick="applyManualLocation()">✓ Pakai Koordinat Ini</button>
+        </div>
+        <div class="form-hint">Di luar area / tidak ada sinyal GPS? Isi koordinat kota Anda secara manual (bisa dilihat di Google Maps dengan menekan lama pada peta). Pilih zona waktu "Otomatis" agar mengikuti jam perangkat.</div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div class="form-group">
+          <label class="form-label">Koreksi Hijriah:</label>
+          <select id="inp-hijri-adj" class="form-input">
+            <option value="-2">-2 Hari</option>
+            <option value="-1">-1 Hari</option>
+            <option value="0" selected>0 Hari (Standar)</option>
+            <option value="1">+1 Hari</option>
+            <option value="2">+2 Hari</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ihtiyat (Menit):</label>
+          <input type="number" id="inp-ihtiyat" class="form-input" value="2" min="0" max="10" />
+        </div>
+      </div>
+
+      <div class="form-group" style="padding-top: 8px; border-top: 1px solid #1e293b; margin-top: 10px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <label class="form-label" style="margin-bottom: 0;">Suara Alarm Pengingat:</label>
+          <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;" onclick="testSound()">🔊 Uji Suara</button>
+        </div>
+        <select id="inp-sound" class="form-input">
+          <option value="adhan-melody">Melodi Adzan (Harmoni Timur Tengah)</option>
+          <option value="chime">Soft Chime (Genta Akustik)</option>
+          <option value="beep">Beep Digital (5x Nada Standar)</option>
+          <option value="classic-bell">Lonceng Klasik</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Daftar Hadits Running Text (Pisahkan baris baru):</label>
+        <textarea id="inp-hadiths" class="form-input" rows="3" style="font-size: 11px; line-height: 1.5; resize: vertical;"></textarea>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+        <button class="btn btn-secondary" onclick="resetDefaults()">Reset Nilai Awal</button>
+        <button class="btn btn-setting" style="padding: 10px 20px;" onclick="saveSettings()">✓ Simpan Setting</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DIALOG UMUM (info GPS, konfirmasi keluar) -->
+  <div class="modal-backdrop" id="modal-dialog" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <div class="dlg-title" id="dlg-title"></div>
+      <div class="dlg-body" id="dlg-body"></div>
+      <div class="dlg-actions" id="dlg-actions"></div>
+    </div>
+  </div>
+
+  <!-- DIALOG KONFIRMASI KELUAR -->
+  <div class="exit-overlay" id="exit-confirm" role="dialog" aria-modal="true" aria-labelledby="exit-confirm-title">
+    <div class="exit-card">
+      <div class="exit-icon">⏻</div>
+      <h3 class="exit-title" id="exit-confirm-title">Keluar dari AYOSO?</h3>
+      <p class="exit-text">Aplikasi akan ditutup dan <b>alarm waktu sholat tidak akan berbunyi</b> sampai aplikasi dibuka kembali.</p>
+      <div class="exit-actions">
+        <button type="button" class="exit-no" onclick="closeExitConfirm()">Tidak</button>
+        <button type="button" class="exit-yes" id="exit-yes" onclick="doExit()">Ya, Keluar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LAYAR SETELAH KELUAR -->
+  <div id="exit-screen">
+    <div class="ex-title">AYOSO</div>
+    <div class="ex-text">Aplikasi telah ditutup. Alarm sholat tidak aktif.<br>Silakan tutup tab / geser aplikasi ini dari daftar aplikasi, atau tekan tombol di bawah untuk membuka kembali.</div>
+    <button class="btn btn-setting" style="padding: 11px 24px; font-size: 13px;" onclick="location.reload()">↻ Buka Kembali AYOSO</button>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'ayoso_offline_settings_v5';
+    let CONFIG = {"mosqueName":"HANANA House","cityName":"Tedoria City","slogan":"SHOLAT Berjama'ah Setiap Waktu","location":{"name":"Cirebon (Default)","latitude":-6.7077,"longitude":108.43,"timezone":7,"elevation":42},"ihtiyatMinutes":2,"hijriAdjustmentDays":0,"iqomahMinutes":{"subuh":12,"dzuhur":10,"ashar":10,"maghrib":8,"isya":10},"alarmSound":"adhan-melody","alarmVolume":0.8,"alarmsEnabled":{"subuh":true,"syuruq":false,"dzuhur":true,"ashar":true,"maghrib":true,"isya":true},"runningTextSpeed":240,"customHadiths":["Rasulullah ﷺ bersabda: \"Shalat berjamaah lebih utama daripada shalat sendirian dengan dua puluh tujuh derajat.\" (HR. Bukhari & Muslim)","Rasulullah ﷺ bersabda: \"Barangsiapa shalat berjamaah empat puluh hari dengan mendapatkan takbiratul ihram, maka dicatat baginya terbebas dari dua perkara: dari api neraka dan dari kemunafikan.\" (HR. Tirmidzi)","Rasulullah ﷺ bersabda: \"Sampaikanlah kabar gembira kepada orang-orang yang berjalan di dalam kegelapan malam menuju masjid, bahwa mereka akan mendapatkan cahaya yang sempurna pada hari kiamat.\" (HR. Abu Dawud & Tirmidzi)","Rasulullah ﷺ bersabda: \"Luruskan shaf-shaf kalian, karena sesungguhnya meluruskan shaf merupakan bagian dari kesempurnaan shalat.\" (HR. Bukhari & Muslim)","Dari Abu Hurairah r.a., Rasulullah ﷺ bersabda: \"Seandainya manusia mengetahui apa yang ada di dalam adzan dan shaf pertama, lalu mereka tidak bisa mendapatkannya melainkan dengan mengundi, niscaya mereka akan mengundi.\" (HR. Bukhari & Muslim)","Rasulullah ﷺ bersabda: \"Tidak ada shalat yang lebih berat bagi orang-orang munafik selain shalat Shubuh dan shalat Isya. Seandainya mereka mengetahui keutamaan keduanya, niscaya mereka akan mendatanginya meski dengan merangkak.\" (HR. Bukhari & Muslim)"]};
+
+    // Load from LocalStorage if user previously edited
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        CONFIG = Object.assign({}, CONFIG, JSON.parse(saved));
+      }
+    } catch(e) {}
+
+    let isMuted = false;
+    let appClosed = false;
+
+    function renderHadithMarquee() {
+      const el = document.getElementById('disp-hadith');
+      if (!el) return;
+      const items = (CONFIG.customHadiths || []).filter(Boolean);
+      const safeItems = items.length ? items : ['Mari makmurkan masjid dengan sholat berjamaah.'];
+      const makeCopy = () => {
+        const copy = document.createElement('div');
+        copy.className = 'marquee-copy';
+        safeItems.forEach((item, index) => {
+          const text = document.createElement('span');
+          text.textContent = item;
+          copy.appendChild(text);
+          if (index < safeItems.length - 1) {
+            const separator = document.createElement('b');
+            separator.textContent = '✦';
+            copy.appendChild(separator);
+          }
+        });
+        return copy;
+      };
+      el.replaceChildren(makeCopy(), makeCopy());
+      el.setAttribute('aria-label', safeItems.join(' • '));
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast-msg');
+      if (t) {
+        t.innerText = msg;
+        t.style.display = 'block';
+        setTimeout(() => { t.style.display = 'none'; }, 2500);
+      }
+    }
+
+    // Web Audio Synthesizer
+    let audioCtx = null;
+    function getAudioCtx() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      return audioCtx;
+    }
+
+    function playTone(freq, duration, type) {
+      try {
+        const ctx = getAudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.3, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + duration);
+      } catch(e) {}
+    }
+
+    function playAlarm() {
+      if (isMuted || appClosed) return;
+      const type = CONFIG.alarmSound || 'adhan-melody';
+      if (type === 'beep') {
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => playTone(i === 4 ? 1760 : 880, 0.15, 'square'), i * 350);
+        }
+      } else if (type === 'chime') {
+        [523, 659, 783, 1046].forEach((f, i) => setTimeout(() => playTone(f, 1.8), i * 150));
+      } else {
+        const melody = [293, 311, 369, 392, 440, 392, 369, 293];
+        melody.forEach((f, i) => setTimeout(() => playTone(f, 0.8, 'triangle'), i * 600));
+      }
+    }
+
+    function testSound() {
+      const oldType = CONFIG.alarmSound;
+      CONFIG.alarmSound = document.getElementById('inp-sound').value;
+      playAlarm();
+      CONFIG.alarmSound = oldType;
+    }
+
+    function toggleSound() {
+      isMuted = !isMuted;
+      document.getElementById('btn-sound').innerText = isMuted ? '🔇 Bisukan' : '🔊 Suara';
+      showToast(isMuted ? 'Suara alarm dibisukan' : 'Suara alarm aktif');
+    }
+
+    // ===== Dialog umum =====
+    function escHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+    function closeDialog() { document.getElementById('modal-dialog').style.display = 'none'; }
+    function showDialog(title, html, buttons) {
+      document.getElementById('dlg-title').textContent = title;
+      document.getElementById('dlg-body').innerHTML = html;
+      const box = document.getElementById('dlg-actions');
+      box.replaceChildren();
+      (buttons && buttons.length ? buttons : [{ label: 'Tutup' }]).forEach((b) => {
+        const btn = document.createElement('button');
+        btn.className = 'btn ' + (b.cls || 'btn-secondary');
+        btn.textContent = b.label;
+        btn.addEventListener('click', () => { closeDialog(); if (b.onClick) b.onClick(); });
+        box.appendChild(btn);
+      });
+      document.getElementById('modal-dialog').style.display = 'flex';
+    }
+
+    // ===== Tombol Out (keluar aplikasi) =====
+    function exitApp() {
+      document.getElementById('exit-confirm').classList.add('show');
+      const y = document.getElementById('exit-yes');
+      if (y) y.focus();
+    }
+    function closeExitConfirm() {
+      document.getElementById('exit-confirm').classList.remove('show');
+    }
+    document.addEventListener('keydown', (ev) => {
+      const ov = document.getElementById('exit-confirm');
+      if (!ov || !ov.classList.contains('show')) return;
+      if (ev.key === 'Escape' || ev.key === 'n' || ev.key === 'N') closeExitConfirm();
+      if (ev.key === 'y' || ev.key === 'Y') doExit();
+    });
+    function doExit() {
+      closeExitConfirm();
+      appClosed = true;
+      try { if (document.fullscreenElement) document.exitFullscreen(); else if (document.webkitFullscreenElement) document.webkitExitFullscreen(); } catch (e) {}
+      try { if (audioCtx) audioCtx.close(); } catch (e) {}
+      // Jembatan umum untuk aplikasi pembungkus (WebView Android / Cordova / Capacitor / Flutter)
+      try { if (window.Android && typeof window.Android.exitApp === 'function') { window.Android.exitApp(); return; } } catch (e) {}
+      try { if (window.AndroidInterface && typeof window.AndroidInterface.exitApp === 'function') { window.AndroidInterface.exitApp(); return; } } catch (e) {}
+      try { if (navigator.app && typeof navigator.app.exitApp === 'function') { navigator.app.exitApp(); return; } } catch (e) {}
+      try { if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) { window.Capacitor.Plugins.App.exitApp(); return; } } catch (e) {}
+      try { if (window.flutter_inappwebview && window.flutter_inappwebview.callHandler) { window.flutter_inappwebview.callHandler('exitApp'); return; } } catch (e) {}
+      // Browser biasa: coba tutup tab/jendela
+      try { window.open('', '_self'); window.close(); } catch (e) {}
+      // Jika browser menolak menutup tab, kosongkan halaman (tanpa tampilan apa pun)
+      setTimeout(() => { try { window.location.replace('about:blank'); } catch (e) {} }, 80);
+    }
+
+        // Modal Handlers
+    function openSettingModal() {
+      document.getElementById('inp-mosque').value = CONFIG.mosqueName || 'HANANA House';
+      document.getElementById('inp-city').value = CONFIG.cityName || 'Tedoria City';
+      document.getElementById('inp-slogan').value = CONFIG.slogan || "SHOLAT Berjama'ah Setiap Waktu";
+      document.getElementById('inp-hijri-adj').value = CONFIG.hijriAdjustmentDays || 0;
+      document.getElementById('inp-ihtiyat').value = CONFIG.ihtiyatMinutes || 2;
+      document.getElementById('inp-sound').value = CONFIG.alarmSound || 'adhan-melody';
+      if (document.getElementById('inp-hadiths') && CONFIG.customHadiths) {
+        document.getElementById('inp-hadiths').value = CONFIG.customHadiths.join('\n');
+      }
+      fillLocationFields();
+      document.getElementById('modal-setting').style.display = 'flex';
+    }
+
+    function closeSettingModal() {
+      document.getElementById('modal-setting').style.display = 'none';
+    }
+
+    function saveSettings() {
+      CONFIG.mosqueName = document.getElementById('inp-mosque').value.trim() || 'HANANA House';
+      CONFIG.cityName = document.getElementById('inp-city').value.trim() || 'Tedoria City';
+      CONFIG.slogan = document.getElementById('inp-slogan').value.trim() || "SHOLAT Berjama'ah Setiap Waktu";
+      CONFIG.hijriAdjustmentDays = parseInt(document.getElementById('inp-hijri-adj').value, 10) || 0;
+      CONFIG.ihtiyatMinutes = parseInt(document.getElementById('inp-ihtiyat').value, 10) || 2;
+      CONFIG.alarmSound = document.getElementById('inp-sound').value;
+
+      const hadithArea = document.getElementById('inp-hadiths');
+      if (hadithArea && hadithArea.value.trim()) {
+        CONFIG.customHadiths = hadithArea.value.split('\n').map(s => s.trim()).filter(Boolean);
+        renderHadithMarquee();
+      }
+
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(CONFIG));
+      } catch(e) {}
+
+      document.getElementById('disp-mosque').innerText = CONFIG.mosqueName;
+      document.getElementById('disp-city').innerText = '📍 ' + CONFIG.cityName;
+      document.getElementById('disp-slogan').innerText = CONFIG.slogan;
+
+      closeSettingModal();
+      update();
+      showToast('✓ Setting berhasil disimpan di HP Anda!');
+    }
+
+    function resetDefaults() {
+      if (confirm('Kembalikan ke nilai awal (HANANA House, Tedoria City, Cirebon)?')) {
+        CONFIG.mosqueName = 'HANANA House';
+        CONFIG.cityName = 'Tedoria City';
+        CONFIG.slogan = "SHOLAT Berjama'ah Setiap Waktu";
+        CONFIG.location = { name: 'Cirebon', latitude: -6.7077, longitude: 108.43, timezone: 7, elevation: 42 };
+        CONFIG.ihtiyatMinutes = 2;
+        CONFIG.hijriAdjustmentDays = 0;
+        try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+        openSettingModal();
+        saveSettings();
+      }
+    }
+
+    const PRESETS = {
+      cirebon: { name: 'Cirebon', latitude: -6.7077, longitude: 108.43, timezone: 7, elevation: 42 },
+      jakarta: { name: 'DKI Jakarta', latitude: -6.2088, longitude: 106.8456, timezone: 7, elevation: 10 },
+      bandung: { name: 'Kota Bandung', latitude: -6.9175, longitude: 107.6191, timezone: 7, elevation: 708 },
+      semarang: { name: 'Kota Semarang', latitude: -6.9667, longitude: 110.4167, timezone: 7, elevation: 15 },
+      surabaya: { name: 'Kota Surabaya', latitude: -7.2575, longitude: 112.7521, timezone: 7, elevation: 5 },
+      yogyakarta: { name: 'D.I. Yogyakarta', latitude: -7.7956, longitude: 110.3695, timezone: 7, elevation: 113 },
+      medan: { name: 'Kota Medan', latitude: 3.5952, longitude: 98.6722, timezone: 7, elevation: 20 },
+      makassar: { name: 'Kota Makassar', latitude: -5.1477, longitude: 119.4327, timezone: 8, elevation: 10 }
+    };
+
+    function applyPreset(val) {
+      if (PRESETS[val]) {
+        CONFIG.location = Object.assign({}, PRESETS[val], { autoTz: false, source: 'preset' });
+        fillLocationFields();
+        refreshLocStatus();
+      }
+    }
+
+    // ===== Zona waktu & lokasi =====
+    function deviceTz() { return -new Date().getTimezoneOffset() / 60; }
+    function activeTz() {
+      const loc = CONFIG.location || {};
+      return loc.autoTz ? deviceTz() : (typeof loc.timezone === 'number' ? loc.timezone : 7);
+    }
+    function tzLabel(tz) {
+      if (tz === 7) return 'WIB';
+      if (tz === 8) return 'WITA';
+      if (tz === 9) return 'WIT';
+      const a = Math.abs(tz), h = Math.floor(a), m = Math.round((a - h) * 60);
+      return 'UTC' + (tz < 0 ? '-' : '+') + h + (m ? ':' + String(m).padStart(2, '0') : '');
+    }
+    function initTzOptions() {
+      const sel = document.getElementById('inp-tz');
+      if (!sel) return;
+      const opts = [['auto', 'Otomatis (ikut jam perangkat)'], ['7', 'WIB (UTC+7)'], ['8', 'WITA (UTC+8)'], ['9', 'WIT (UTC+9)']];
+      for (let z = -12; z <= 14; z++) {
+        if (z === 7 || z === 8 || z === 9) continue;
+        opts.push([String(z), 'UTC' + (z < 0 ? '' : '+') + z]);
+      }
+      [-3.5, -9.5, 3.5, 4.5, 5.5, 5.75, 6.5, 8.75, 9.5, 10.5, 12.75].forEach((z) => opts.push([String(z), tzLabel(z)]));
+      sel.replaceChildren();
+      opts.forEach(([v, t]) => { const o = document.createElement('option'); o.value = v; o.textContent = t; sel.appendChild(o); });
+    }
+    function refreshLocStatus() {
+      const el = document.getElementById('loc-status');
+      if (!el) return;
+      const l = CONFIG.location || {};
+      const src = l.source === 'gps' ? 'GPS' : l.source === 'ip' ? 'Perkiraan internet' : l.source === 'manual' ? 'Manual' : 'Preset kota';
+      el.textContent = (l.name || 'Lokasi') + '\n' + Number(l.latitude).toFixed(4) + ', ' + Number(l.longitude).toFixed(4) + ' • ' + tzLabel(activeTz()) + ' • ' + src;
+      el.style.whiteSpace = 'pre-line';
+    }
+    function fillLocationFields() {
+      const l = CONFIG.location || {};
+      const set = (id, v) => { const e = document.getElementById(id); if (e) e.value = v; };
+      set('inp-lat', l.latitude);
+      set('inp-lon', l.longitude);
+      set('inp-tz', l.autoTz ? 'auto' : String(l.timezone));
+      let key = 'custom';
+      Object.keys(PRESETS).forEach((k) => { if (!l.autoTz && l.source !== 'gps' && l.source !== 'ip' && l.source !== 'manual' && Math.abs(PRESETS[k].latitude - l.latitude) < 1e-4 && Math.abs(PRESETS[k].longitude - l.longitude) < 1e-4) key = k; });
+      set('inp-preset', key);
+      refreshLocStatus();
+    }
+    function persistConfig() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(CONFIG)); } catch (e) {} }
+
+    function applyLocation(lat, lon, name, source, alt) {
+      CONFIG.location = {
+        name: name,
+        latitude: parseFloat(Number(lat).toFixed(5)),
+        longitude: parseFloat(Number(lon).toFixed(5)),
+        timezone: deviceTz(),
+        autoTz: true,
+        elevation: isFinite(alt) && alt !== null ? Math.round(alt) : 35,
+        source: source
+      };
+      persistConfig();
+      update();
+      fillLocationFields();
+    }
+
+    function applyManualLocation() {
+      const num = (id) => parseFloat(String(document.getElementById(id).value).trim().replace(',', '.'));
+      const lat = num('inp-lat'), lon = num('inp-lon');
+      if (!isFinite(lat) || lat < -90 || lat > 90 || !isFinite(lon) || lon < -180 || lon > 180) {
+        showDialog('Koordinat tidak valid', 'Lintang harus antara -90 s/d 90 dan bujur antara -180 s/d 180.<br>Contoh Cirebon: <b>-6.7077</b> dan <b>108.43</b>.');
+        return;
+      }
+      const tzSel = document.getElementById('inp-tz').value;
+      const auto = tzSel === 'auto';
+      CONFIG.location = {
+        name: 'Manual: ' + lat.toFixed(3) + ', ' + lon.toFixed(3),
+        latitude: parseFloat(lat.toFixed(5)),
+        longitude: parseFloat(lon.toFixed(5)),
+        timezone: auto ? deviceTz() : parseFloat(tzSel),
+        autoTz: auto,
+        elevation: 35,
+        source: 'manual'
+      };
+      persistConfig();
+      update();
+      fillLocationFields();
+      showToast('✓ Lokasi manual dipakai untuk jadwal sholat');
+    }
+
+    // ===== GPS Sync (tahan banting: di luar area, sinyal lemah, izin ditolak) =====
+    let gpsBusy = false;
+    function setGpsBusy(b) {
+      gpsBusy = b;
+      document.querySelectorAll('[onclick="syncGps()"]').forEach((btn) => {
+        btn.disabled = b;
+        if (btn.closest('.btn-group')) btn.textContent = b ? '⏳ Membaca...' : '🧭 Sinkron GPS';
+      });
+    }
+    function getPos(opts) {
+      return new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, opts));
+    }
+    function fetchJson(url, ms) {
+      const c = new AbortController();
+      const t = setTimeout(() => c.abort(), ms);
+      return fetch(url, { signal: c.signal, cache: 'no-store' })
+        .then((r) => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .finally(() => clearTimeout(t));
+    }
+    async function ipLocate() {
+      const tries = [
+        async () => { const j = await fetchJson('https://ipwho.is/', 7000); if (j.success === false) throw 0; return { lat: +j.latitude, lon: +j.longitude, place: [j.city, j.country].filter(Boolean).join(', ') }; },
+        async () => { const j = await fetchJson('https://ipapi.co/json/', 7000); if (j.error) throw 0; return { lat: +j.latitude, lon: +j.longitude, place: [j.city, j.country_name].filter(Boolean).join(', ') }; },
+        async () => { const j = await fetchJson('https://get.geojs.io/v1/ip/geo.json', 7000); return { lat: parseFloat(j.latitude), lon: parseFloat(j.longitude), place: [j.city, j.country].filter(Boolean).join(', ') }; }
+      ];
+      for (const f of tries) {
+        try { const r = await f(); if (isFinite(r.lat) && isFinite(r.lon)) return r; } catch (e) {}
+      }
+      return null;
+    }
+    async function reverseName(lat, lon) {
+      try {
+        const j = await fetchJson('https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=' + lat + '&longitude=' + lon + '&localityLanguage=id', 5000);
+        return [j.city || j.locality, j.countryName].filter(Boolean).join(', ');
+      } catch (e) { return ''; }
+    }
+    function openManualFromDialog() {
+      openSettingModal();
+      setTimeout(() => { const e = document.getElementById('inp-lat'); if (e) { e.scrollIntoView({ block: 'center' }); e.focus(); } }, 150);
+    }
+    function showGpsFailure(reason) {
+      const msgs = {
+        denied: '<b>Izin lokasi ditolak.</b> Aktifkan kembali izinnya:<ul>' +
+          '<li>Di browser: ketuk ikon gembok / ⚙️ di address bar → <i>Izin</i> → <i>Lokasi</i> → <b>Izinkan</b>.</li>' +
+          '<li>Di Android: Pengaturan → Aplikasi → (browser / aplikasi ini) → Izin → <b>Lokasi</b>.</li>' +
+          '<li>Pastikan <b>Lokasi / GPS HP menyala</b>, lalu tekan <i>Coba Lagi</i>.</li></ul>',
+        timeout: '<b>Sinyal GPS belum didapat</b> (waktu habis). Coba pindah ke tempat terbuka / dekat jendela, pastikan Lokasi HP menyala, lalu <i>Coba Lagi</i>.',
+        unavailable: '<b>Lokasi tidak tersedia.</b> Nyalakan Lokasi / GPS HP (mode akurasi tinggi) lalu <i>Coba Lagi</i>.',
+        insecure: '<b>Browser hanya mengizinkan GPS pada halaman aman (HTTPS).</b> Buka file ini lewat alamat <i>https://</i> atau dari penyimpanan HP (file lokal), bukan <i>http://</i> biasa.',
+        unsupported: '<b>Perangkat / browser ini tidak mendukung GPS.</b>'
+      };
+      showDialog('GPS belum bisa dipakai',
+        (msgs[reason] || msgs.unavailable) + '<br><br>Internet juga tidak tersedia untuk perkiraan lokasi. Anda tetap bisa mengisi <b>koordinat manual</b> di Setting.',
+        [
+          { label: 'Tutup' },
+          { label: '✎ Isi Koordinat Manual', onClick: openManualFromDialog },
+          { label: '↻ Coba Lagi', cls: 'btn-setting', onClick: syncGps }
+        ]);
+    }
+
+    async function syncGps() {
+      if (gpsBusy) return;
+      setGpsBusy(true);
+      try {
+        let reason = 'unavailable';
+        if (!window.isSecureContext) {
+          reason = 'insecure';
+        } else if (!('geolocation' in navigator)) {
+          reason = 'unsupported';
+        } else {
+          let denied = false;
+          if (navigator.permissions && navigator.permissions.query) {
+            try { const st = await navigator.permissions.query({ name: 'geolocation' }); if (st.state === 'denied') denied = true; } catch (e) {}
+          }
+          if (!denied) {
+            showToast('Membaca GPS... mohon tunggu');
+            const attempts = [
+              { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 },
+              { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 }
+            ];
+            for (const opt of attempts) {
+              try {
+                const pos = await getPos(opt);
+                const lat = pos.coords.latitude, lon = pos.coords.longitude;
+                applyLocation(lat, lon, 'GPS: ' + lat.toFixed(3) + ', ' + lon.toFixed(3), 'gps', pos.coords.altitude);
+                showToast('✓ GPS berhasil disinkronkan!');
+                reverseName(lat, lon).then((nm) => {
+                  if (nm && CONFIG.location && CONFIG.location.source === 'gps') {
+                    CONFIG.location.name = 'GPS: ' + nm;
+                    persistConfig();
+                    refreshLocStatus();
+                  }
+                });
+                return;
+              } catch (err) {
+                if (err && err.code === 1) { denied = true; break; }
+                reason = (err && err.code === 3) ? 'timeout' : 'unavailable';
+              }
+            }
+          }
+          if (denied) reason = 'denied';
+        }
+
+        // Cadangan: perkiraan lokasi lewat internet (tingkat kota)
+        showToast('GPS belum tersedia, mencoba lewat internet...');
+        const ip = await ipLocate();
+        if (ip) {
+          applyLocation(ip.lat, ip.lon, 'Perkiraan: ' + (ip.place || (ip.lat.toFixed(2) + ', ' + ip.lon.toFixed(2))), 'ip', null);
+          const why = reason === 'denied' ? 'izin lokasi ditolak' : reason === 'insecure' ? 'halaman tidak aman (bukan HTTPS)' : reason === 'timeout' ? 'sinyal GPS belum didapat' : 'GPS tidak tersedia';
+          showDialog('Memakai lokasi perkiraan',
+            'GPS tidak bisa dipakai (' + escHtml(why) + '), jadi jadwal sholat memakai <b>perkiraan lokasi dari internet</b>:<br><br><b>' + escHtml(ip.place || 'Lokasi terdeteksi') + '</b><br><br>Akurasi hanya tingkat kota. Untuk hasil lebih tepat, aktifkan GPS lalu sinkron ulang, atau isi koordinat manual.',
+            [{ label: 'OK', cls: 'btn-setting' }, { label: '✎ Koordinat Manual', onClick: openManualFromDialog }, { label: '↻ Coba GPS Lagi', onClick: syncGps }]);
+          return;
+        }
+        showGpsFailure(reason);
+      } finally {
+        setGpsBusy(false);
+      }
+    }
+
+        // Calculations
+    const HIJRI_MONTHS = ["Muharram", "Safar", "Rabi'ul Awal", "Rabi'ul Akhir", "Jumadil Awal", "Jumadil Akhir", "Rajab", "Sya'ban", "Ramadhan", "Syawwal", "Dzulqa'dah", "Dzulhijjah"];
+    const GREG_MONTHS = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    const DAYS = ["Ahad", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+
+    function getDates(d) {
+      const dayName = DAYS[d.getDay()];
+      const greg = dayName + ", " + d.getDate() + " " + GREG_MONTHS[d.getMonth()] + " " + d.getFullYear();
+
+      const adj = CONFIG.hijriAdjustmentDays || 0;
+      const targetDate = new Date(d);
+      if (adj !== 0) targetDate.setDate(targetDate.getDate() + adj);
+
+      let day = targetDate.getDate(), month = targetDate.getMonth(), year = targetDate.getFullYear();
+      let m = month + 1, y = year;
+      if (m < 3) { y -= 1; m += 12; }
+      let a = Math.floor(y / 100), b = 2 - a + Math.floor(a / 4);
+      let jd = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + day + b - 1524;
+      let bjd = jd - 1948440 + 10632;
+      let n = Math.floor((bjd - 1) / 10631);
+      let rem = bjd - 10631 * n + 354;
+      let j = Math.floor((10985 - rem) / 5316) * Math.floor((50 * rem) / 17719) + Math.floor(rem / 5670) * Math.floor((43 * rem) / 15238);
+      let rem2 = rem - Math.floor((30 - j) / 15) * Math.floor((17719 * j) / 50) - Math.floor(j / 16) * Math.floor((15238 * j) / 43) + 29;
+      let hMonth = Math.floor((24 * rem2) / 709);
+      let hDay = rem2 - Math.floor((709 * hMonth) / 24);
+      let hYear = 30 * n + j - 30;
+      let cMonth = Math.min(Math.max(hMonth, 1), 12);
+      let hijri = hDay + " " + HIJRI_MONTHS[cMonth - 1] + " " + hYear + " H";
+
+      return { greg, hijri };
+    }
+
+    function calcPrayer(date, loc, ihtiyat) {
+      const d2r = (deg) => (deg * Math.PI) / 180;
+      const r2d = (rad) => (rad * 180) / Math.PI;
+      const fixA = (a) => { let r = a - 360 * Math.floor(a / 360); return r < 0 ? r + 360 : r; };
+      const fixH = (h) => { let r = h - 24 * Math.floor(h / 24); return r < 0 ? r + 24 : r; };
+
+      let y = date.getFullYear(), m = date.getMonth() + 1, d = date.getDate();
+      if (m <= 2) { y -= 1; m += 12; }
+      let a = Math.floor(y / 100), b = 2 - a + Math.floor(a / 4);
+      let jd = Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + b - 1524.5;
+      let dJ = jd - 2451545.0;
+      let g = fixA(357.529 + 0.98560028 * dJ);
+      let q = fixA(280.459 + 0.98564736 * dJ);
+      let l = fixA(q + 1.915 * Math.sin(d2r(g)) + 0.02 * Math.sin(d2r(2 * g)));
+      let e = 23.439 - 0.00000036 * dJ;
+      let decl = r2d(Math.asin(Math.sin(d2r(e)) * Math.sin(d2r(l))));
+      let ra = r2d(Math.atan2(Math.cos(d2r(e)) * Math.sin(d2r(l)), Math.cos(d2r(l)))) / 15;
+      let eqt = q / 15 - fixH(ra);
+      let noon = fixH(12 + loc.timezone - loc.longitude / 15 - eqt);
+
+      const rawHA = (alt) => {
+        let cosH = (Math.sin(d2r(alt)) - Math.sin(d2r(loc.latitude)) * Math.sin(d2r(decl))) / (Math.cos(d2r(loc.latitude)) * Math.cos(d2r(decl)));
+        return (cosH > 1 || cosH < -1) ? null : r2d(Math.acos(cosH)) / 15;
+      };
+      const hourAngle = (alt) => { const v = rawHA(alt); return v === null ? 1.5 : v; };
+
+      let subuhH = rawHA(-20.0);
+      let isyaH = rawHA(-18.0);
+      let sunRaw = rawHA(-1.0);
+      let sunH = sunRaw === null ? 1.5 : sunRaw;
+      // Cadangan untuk lintang tinggi (luar negeri): aturan 1/7 malam bila sudut fajar/isya tidak tercapai
+      const nightPart = sunRaw !== null ? (24 - 2 * sunH) / 7 : 1.5;
+      if (subuhH === null) subuhH = sunH + nightPart;
+      if (isyaH === null) isyaH = sunH + nightPart;
+      let asharAlt = r2d(Math.atan(1 / (1.0 + Math.tan(d2r(Math.abs(loc.latitude - decl))))));
+      let asharH = hourAngle(asharAlt);
+
+      let ih = (ihtiyat || 2) / 60;
+      const fmt = (hr) => {
+        let norm = fixH(hr);
+        let sec = Math.round(norm * 3600);
+        let h = Math.floor(sec / 3600) % 24;
+        let mn = Math.floor((sec % 3600) / 60);
+        return String(h).padStart(2, '0') + ":" + String(mn).padStart(2, '0');
+      };
+
+      return [
+        { key: 'subuh', name: 'SUBUH', time: fmt(noon - subuhH + ih) },
+        { key: 'syuruq', name: 'SYURUQ', time: fmt(noon - sunH - ih) },
+        { key: 'dzuhur', name: 'DZUHUR', time: fmt(noon + ih) },
+        { key: 'ashar', name: 'ASHAR', time: fmt(noon + asharH + ih) },
+        { key: 'maghrib', name: 'MAGHRIB', time: fmt(noon + sunH + ih) },
+        { key: 'isya', name: 'ISYA', time: fmt(noon + isyaH + ih) }
+      ];
+    }
+
+    let lastAlertTime = '';
+    function update() {
+      if (appClosed) return;
+      const now = new Date();
+      document.getElementById('disp-h').innerText = String(now.getHours()).padStart(2, '0');
+      document.getElementById('disp-m').innerText = String(now.getMinutes()).padStart(2, '0');
+      document.getElementById('disp-s').innerText = String(now.getSeconds()).padStart(2, '0');
+
+      const dates = getDates(now);
+      document.getElementById('disp-hijri').innerText = "🌙 " + dates.hijri;
+      document.getElementById('disp-masehi').innerText = "📅 " + dates.greg;
+
+      const locNow = Object.assign({}, CONFIG.location, { timezone: activeTz() });
+      const tzl = tzLabel(locNow.timezone);
+      const schedule = calcPrayer(now, locNow, CONFIG.ihtiyatMinutes || 2);
+      const currMs = now.getTime();
+      let nextItem = null;
+      let minDiff = Infinity;
+
+      schedule.forEach((p) => {
+        const [h, m] = p.time.split(':').map(Number);
+        const pDate = new Date(now);
+        pDate.setHours(h, m, 0, 0);
+        const diff = pDate.getTime() - currMs;
+        if (diff > 0 && diff < minDiff) {
+          minDiff = diff;
+          nextItem = p;
+        }
+      });
+
+      if (!nextItem) {
+        nextItem = schedule[0];
+        const [h, m] = schedule[0].time.split(':').map(Number);
+        const tom = new Date(now);
+        tom.setDate(tom.getDate() + 1);
+        tom.setHours(h, m, 0, 0);
+        minDiff = tom.getTime() - currMs;
+      }
+
+      document.getElementById('disp-next-name').innerText = nextItem.name + " (" + nextItem.time + " " + tzl + ")";
+      const totalSec = Math.floor(Math.max(0, minDiff) / 1000);
+      const ch = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+      const cm = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+      const cs = String(totalSec % 60).padStart(2, '0');
+      document.getElementById('disp-countdown').innerText = ch + ":" + cm + ":" + cs;
+
+      // Auto Alarm Trigger
+      const curStr = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
+      if (now.getSeconds() === 0 && curStr !== lastAlertTime) {
+        const match = schedule.find(p => p.time === curStr);
+        if (match) {
+          lastAlertTime = curStr;
+          playAlarm();
+        }
+      }
+
+      // Render cards
+      const container = document.getElementById('prayer-cards-container');
+      container.innerHTML = schedule.map(p => {
+        const isNext = p.key === nextItem.key;
+        return '<div class="prayer-card ' + (isNext ? 'active-next' : '') + '">' +
+          '<div class="card-title">' + p.name + '</div>' +
+          '<div class="card-time font-digital">' + p.time + '</div>' +
+          '<div class="card-badge">' + (isNext ? 'BERIKUTNYA' : tzl) + '</div>' +
+          '</div>';
+      }).join('');
+    }
+
+    initTzOptions();
+    refreshLocStatus();
+    renderHadithMarquee();
+    setInterval(update, 1000);
+    update();
+  </script>
+</body>
+</html>
