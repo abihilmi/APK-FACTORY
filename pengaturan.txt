@@ -1,0 +1,3 @@
+nama=AYOSO
+lokasi=ya
+screensaver=ya
