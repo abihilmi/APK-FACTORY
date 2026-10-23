@@ -34,13 +34,21 @@ jobs:
           sed -i 's#<application#<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <application#' android/app/src/main/AndroidManifest.xml
           npx cap sync android
 
-      - name: Pasang icon (jika ada AYOSO.png di repo)
+      - name: Pasang icon (dari folder icons atau AYOSO.png)
         run: |
-          if [ -f AYOSO.png ]; then
+          ICON=""
+          if [ -f icons/AYOSO.png ]; then ICON="icons/AYOSO.png"
+          elif [ -f AYOSO.png ]; then ICON="AYOSO.png"
+          else ICON=$(ls icons/*.png 2>/dev/null | head -n 1)
+          fi
+          if [ -n "$ICON" ]; then
+            echo "Memakai icon: $ICON"
             mkdir -p assets
-            convert AYOSO.png -resize 1024x1024 PNG32:assets/icon.png
+            convert "$ICON" -resize 1024x1024 PNG32:assets/icon.png
             npm install @capacitor/assets@3
             npx capacitor-assets generate --android --iconBackgroundColor '#ffffff' --iconBackgroundColorDark '#ffffff'
+          else
+            echo "Icon tidak ditemukan, memakai icon bawaan"
           fi
 
       - name: Bangun APK
