@@ -9,6 +9,9 @@ on:
   push:
     branches: [main, master]
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -252,3 +255,12 @@ jobs:
         with:
           name: ${{ env.SLUG }}-apk
           path: android/app/build/outputs/apk/debug/${{ env.SLUG }}.apk
+
+      - name: Buat Release (APK bisa diunduh dari halaman Releases)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "v1.${{ github.run_number }}" "android/app/build/outputs/apk/debug/${SLUG}.apk" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "${APP_NAME} v1.${{ github.run_number }}" \
+            --notes "APK ${APP_NAME} hasil build otomatis nomor ${{ github.run_number }}."
