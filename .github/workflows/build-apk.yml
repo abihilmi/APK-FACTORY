@@ -8,19 +8,16 @@ on:
         required: true
         default: "AYOSO"
         type: string
-
       app_id:
         description: "Identitas unik aplikasi Android"
         required: true
         default: "com.abihilmi.ayoso"
         type: string
-
       source_zip:
         description: "Nama file ZIP proyek di repository"
         required: true
         default: "AYOSO_V22_GitHub_APK_Paket_Revisi.zip"
         type: string
-
       icon_file:
         description: "Lokasi gambar ikon PNG, misalnya icons/AYOSO.png"
         required: false
@@ -34,7 +31,6 @@ jobs:
   build:
     name: Bangun APK
     runs-on: ubuntu-latest
-
     steps:
       - name: Ambil file repository
         uses: actions/checkout@v4
@@ -56,23 +52,21 @@ jobs:
         run: |
           if [ ! -f "$SOURCE_ZIP" ]; then
             echo "File ZIP tidak ditemukan: $SOURCE_ZIP"
+            echo "File ZIP yang tersedia:"
+            ls -la *.zip 2>/dev/null || true
             exit 1
           fi
-
           mkdir source
           unzip -q "$SOURCE_ZIP" -d source
-
           INDEX_FILE=$(find source -type f -name index.html -print -quit)
-
           if [ -z "$INDEX_FILE" ]; then
             echo "File index.html tidak ditemukan dalam ZIP"
             exit 1
           fi
-
           WEB_DIR=$(dirname "$INDEX_FILE")
           echo "WEB_DIR=$WEB_DIR" >> "$GITHUB_ENV"
 
-      - name: Siapkan proyek aplikasi
+      - name: Siapkan proyek aplikasi dan plugin keluar
         env:
           APP_NAME: ${{ inputs.app_name }}
           APP_ID: ${{ inputs.app_id }}
@@ -81,23 +75,47 @@ jobs:
             echo "Identitas aplikasi Android tidak valid"
             exit 1
           fi
-
           mkdir factory-app
           cd factory-app
-
           npm init -y
-          npm install @capacitor/core@7
-          npm install --save-dev @capacitor/cli@7
-          npm install @capacitor/android@7
-          npm install @capacitor/app@7
-          npm install --save-dev @capacitor/assets
-
+          npm install @capacitor/core@7 @capacitor/android@7 @capacitor/app@7
+          npm install --save-dev @capacitor/cli@7 @capacitor/assets esbuild
           mkdir www
           npx cap init "$APP_NAME" "$APP_ID" --web-dir=www
 
-      - name: Masukkan file aplikasi
+      - name: Masukkan file HTML terbaru
+        run: cp -a "$WEB_DIR"/. factory-app/www/
+
+      - name: Hubungkan tombol Out ke fungsi keluar Android
+        working-directory: factory-app
         run: |
-          cp -a "$WEB_DIR"/. factory-app/www/
+          mkdir -p src
+          cat > src/exit-bridge.js <<'JS'
+          import { App } from '@capacitor/app';
+          window.ayosoExitApp = async function () {
+            try { await App.exitApp(); }
+            catch (error) { console.error('Gagal menutup AYOSO:', error); }
+          };
+          JS
+          npx esbuild src/exit-bridge.js --bundle --format=iife --outfile=www/ayoso-exit.js
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('www/index.html')
+          s = p.read_text(encoding='utf-8')
+          old = "try { if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) { window.Capacitor.Plugins.App.exitApp(); return; } } catch (e) {}"
+          new = "try { if (typeof window.ayosoExitApp === 'function') { window.ayosoExitApp(); return; } } catch (e) {}"
+          if old not in s:
+              raise SystemExit('Baris pemanggil plugin lama tidak ditemukan; build dihentikan agar tidak membuat APK tanpa perbaikan.')
+          s = s.replace(old, new, 1)
+          tag = '<script src="ayoso-exit.js"></script>'
+          if tag not in s:
+              if '</body>' not in s.lower():
+                  raise SystemExit('Tag penutup body tidak ditemukan; build dihentikan.')
+              i = s.lower().rfind('</body>')
+              s = s[:i] + tag + '\n' + s[i:]
+          p.write_text(s, encoding='utf-8')
+          print('Jembatan tombol keluar berhasil dipasang.')
+          PY
 
       - name: Tambahkan Android
         working-directory: factory-app
@@ -112,11 +130,8 @@ jobs:
             echo "Gambar ikon tidak ditemukan: $ICON_FILE"
             exit 1
           fi
-
           mkdir -p factory-app/assets
           cp "$ICON_FILE" factory-app/assets/icon.png
-          cp "$ICON_FILE" factory-app/assets/icon-foreground.png
-          cp "$ICON_FILE" factory-app/assets/icon-background.png
 
       - name: Buat ikon Android
         if: ${{ inputs.icon_file != '' }}
