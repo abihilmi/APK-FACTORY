@@ -1,4 +1,8 @@
-name: Build APK AYOSO
+name: Build APK Umum
+
+# Cara pakai: upload 1 file HTML ke halaman utama repo (nama bebas, mis. index.html).
+# Opsional: pengaturan.txt, folder icons (gambar PNG), debug.keystore.
+# Build jalan otomatis setiap ada perubahan di repo. APK ada di tab Actions > Artifacts.
 
 on:
   workflow_dispatch:
@@ -23,32 +27,217 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Siapkan proyek Android dari AYOSO.html
+      - name: Baca file HTML, nama aplikasi, dan pengaturan
+        run: |
+          # 1. Cari file HTML (index.html dulu, kalau tidak ada pakai .html pertama di halaman utama)
+          if [ -f index.html ]; then HTML_FILE="index.html"
+          else HTML_FILE=$(ls *.html 2>/dev/null | head -n 1)
+          fi
+          if [ -z "$HTML_FILE" ]; then
+            echo "ERROR: Tidak ada file .html di halaman utama repo. Upload file HTML dulu."
+            exit 1
+          fi
+
+          # 2. Baca pengaturan.txt (jika ada)
+          getcfg() { [ -f pengaturan.txt ] && grep -i "^$1=" pengaturan.txt | head -n 1 | cut -d= -f2- | tr -d '\r' | sed 's/^ *//;s/ *$//'; }
+          NAME=$(getcfg nama || true)
+          WANT_LOC=$(getcfg lokasi || true)
+          WANT_DREAM=$(getcfg screensaver || true)
+
+          # 3. Nama aplikasi: dari pengaturan.txt, kalau kosong pakai nama file HTML (atau nama repo untuk index.html)
+          if [ -z "$NAME" ]; then
+            BASE="${HTML_FILE%.html}"
+            if [ "$BASE" = "index" ]; then BASE="${GITHUB_REPOSITORY#*/}"; fi
+            NAME="$BASE"
+          fi
+          NAME=$(printf '%s' "$NAME" | tr -cd 'A-Za-z0-9 ._-')
+          if [ -z "$NAME" ]; then NAME="Aplikasi"; fi
+
+          # 4. Nama paket otomatis: com.<pemilik repo>.<nama aplikasi>
+          SLUG=$(printf '%s' "$NAME" | tr 'A-Z' 'a-z' | tr -cd 'a-z0-9')
+          if [ -z "$SLUG" ]; then SLUG="app"; fi
+          case "$SLUG" in [0-9]*) SLUG="a$SLUG";; esac
+          OWNER=$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr 'A-Z' 'a-z' | tr -cd 'a-z0-9')
+          if [ -z "$OWNER" ]; then OWNER="app"; fi
+          case "$OWNER" in [0-9]*) OWNER="a$OWNER";; esac
+          PKG="com.$OWNER.$SLUG"
+
+          # 5. Icon: folder icons dulu, lalu halaman utama
+          ICON_FILE=""
+          if [ -f icons/icon.png ]; then ICON_FILE="icons/icon.png"
+          elif ls icons/*.png >/dev/null 2>&1; then ICON_FILE=$(ls icons/*.png | head -n 1)
+          elif [ -f icon.png ]; then ICON_FILE="icon.png"
+          elif ls *.png >/dev/null 2>&1; then ICON_FILE=$(ls *.png | head -n 1)
+          fi
+
+          LOWER_LOC=$(printf '%s' "$WANT_LOC" | tr 'A-Z' 'a-z')
+          LOWER_DREAM=$(printf '%s' "$WANT_DREAM" | tr 'A-Z' 'a-z')
+
+          {
+            echo "HTML_FILE=$HTML_FILE"
+            echo "APP_NAME=$NAME"
+            echo "SLUG=$SLUG"
+            echo "PKG=$PKG"
+            echo "ICON_FILE=$ICON_FILE"
+            echo "WANT_LOC=$LOWER_LOC"
+            echo "WANT_DREAM=$LOWER_DREAM"
+          } >> "$GITHUB_ENV"
+
+          echo "File HTML     : $HTML_FILE"
+          echo "Nama aplikasi : $NAME"
+          echo "Nama paket    : $PKG"
+          echo "Icon          : ${ICON_FILE:-(bawaan)}"
+          echo "Izin lokasi   : ${LOWER_LOC:-tidak}"
+          echo "Screensaver   : ${LOWER_DREAM:-tidak}"
+
+      - name: Siapkan proyek Android
         run: |
           mkdir -p www
-          cp AYOSO.html www/index.html
+          cp "$HTML_FILE" www/index.html
           npm init -y
           npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6 @capacitor/app@6
-          npx cap init "AYOSO" "com.abihilmi.ayoso" --web-dir=www
+          npx cap init "$APP_NAME" "$PKG" --web-dir=www
           npx cap add android
-          sed -i 's#<application#<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <application#' android/app/src/main/AndroidManifest.xml
-          npx cap sync android
-
-      - name: Pasang icon (dari folder icons atau AYOSO.png)
-        run: |
-          ICON=""
-          if [ -f icons/AYOSO.png ]; then ICON="icons/AYOSO.png"
-          elif [ -f AYOSO.png ]; then ICON="AYOSO.png"
-          else ICON=$(ls icons/*.png 2>/dev/null | head -n 1)
+          if [ "$WANT_LOC" = "ya" ]; then
+            sed -i 's#<application#<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />\n    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />\n    <application#' android/app/src/main/AndroidManifest.xml
           fi
-          if [ -n "$ICON" ]; then
-            echo "Memakai icon: $ICON"
+          sed -i "s/versionCode 1/versionCode ${{ github.run_number }}/; s/versionName \"1.0\"/versionName \"1.${{ github.run_number }}\"/" android/app/build.gradle
+
+      - name: Tambahkan screensaver (jika screensaver=ya)
+        if: env.WANT_DREAM == 'ya'
+        run: |
+          PKG_DIR="android/app/src/main/java/$(echo "$PKG" | tr . /)"
+          mkdir -p "$PKG_DIR"
+          mkdir -p android/app/src/main/res/xml
+
+          cat > "$PKG_DIR/AppDream.java" <<'JAVA'
+          package __PKG__;
+
+          import android.annotation.SuppressLint;
+          import android.graphics.Color;
+          import android.service.dreams.DreamService;
+          import android.webkit.WebResourceRequest;
+          import android.webkit.WebResourceResponse;
+          import android.webkit.WebSettings;
+          import android.webkit.WebView;
+          import android.webkit.WebViewClient;
+          import androidx.webkit.WebViewAssetLoader;
+          import java.io.InputStream;
+
+          public class AppDream extends DreamService {
+              private WebView webView;
+
+              @SuppressLint("SetJavaScriptEnabled")
+              @Override
+              public void onAttachedToWindow() {
+                  super.onAttachedToWindow();
+                  setInteractive(false);
+                  setFullscreen(true);
+
+                  final WebViewAssetLoader loader = new WebViewAssetLoader.Builder()
+                      .setDomain("localhost")
+                      .addPathHandler("/", new WebViewAssetLoader.PathHandler() {
+                          @Override
+                          public WebResourceResponse handle(String path) {
+                              try {
+                                  if (path == null || path.isEmpty()) path = "index.html";
+                                  InputStream is = getAssets().open("public/" + path);
+                                  String mime = "application/octet-stream";
+                                  if (path.endsWith(".html")) mime = "text/html";
+                                  else if (path.endsWith(".js")) mime = "application/javascript";
+                                  else if (path.endsWith(".css")) mime = "text/css";
+                                  else if (path.endsWith(".png")) mime = "image/png";
+                                  else if (path.endsWith(".jpg") || path.endsWith(".jpeg")) mime = "image/jpeg";
+                                  else if (path.endsWith(".svg")) mime = "image/svg+xml";
+                                  else if (path.endsWith(".json")) mime = "application/json";
+                                  return new WebResourceResponse(mime, "utf-8", is);
+                              } catch (Exception e) {
+                                  return null;
+                              }
+                          }
+                      })
+                      .build();
+
+                  webView = new WebView(this);
+                  webView.setBackgroundColor(Color.BLACK);
+                  WebSettings st = webView.getSettings();
+                  st.setJavaScriptEnabled(true);
+                  st.setDomStorageEnabled(true);
+                  st.setMediaPlaybackRequiresUserGesture(false);
+                  webView.setWebViewClient(new WebViewClient() {
+                      @Override
+                      public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                          return loader.shouldInterceptRequest(request.getUrl());
+                      }
+                  });
+                  setContentView(webView);
+                  webView.loadUrl("https://localhost/index.html");
+              }
+
+              @Override
+              public void onDetachedFromWindow() {
+                  super.onDetachedFromWindow();
+                  if (webView != null) {
+                      webView.destroy();
+                      webView = null;
+                  }
+              }
+          }
+          JAVA
+          sed -i "s/__PKG__/$PKG/" "$PKG_DIR/AppDream.java"
+
+          cat > android/app/src/main/res/xml/app_dream.xml <<'XML'
+          <?xml version="1.0" encoding="utf-8"?>
+          <dream xmlns:android="http://schemas.android.com/apk/res/android" />
+          XML
+
+          python3 - <<'PY'
+          import os
+          p = 'android/app/src/main/AndroidManifest.xml'
+          s = open(p, encoding='utf-8').read()
+          service = """
+              <service
+                  android:name=\"""" + os.environ['PKG'] + """.AppDream"
+                  android:exported="true"
+                  android:label=\"""" + os.environ['APP_NAME'] + """"
+                  android:icon="@mipmap/ic_launcher"
+                  android:permission="android.permission.BIND_DREAM_SERVICE">
+                  <intent-filter>
+                      <action android:name="android.service.dreams.DreamService" />
+                      <category android:name="android.intent.category.DEFAULT" />
+                  </intent-filter>
+                  <meta-data android:name="android.service.dream" android:resource="@xml/app_dream" />
+              </service>
+          """
+          s = s.replace('</application>', service + '</application>')
+          open(p, 'w', encoding='utf-8').write(s)
+          PY
+
+          printf '\ndependencies {\n    implementation "androidx.webkit:webkit:1.9.0"\n}\n' >> android/app/build.gradle
+
+      - name: Sinkronkan file web ke Android
+        run: npx cap sync android
+
+      - name: Pasang icon (jika ada gambar PNG)
+        run: |
+          if [ -n "$ICON_FILE" ]; then
+            echo "Memakai icon: $ICON_FILE"
             mkdir -p assets
             npm install @capacitor/assets@3 sharp
-            node -e "require('sharp')(process.argv[1]).resize(1024,1024,{fit:'contain',background:{r:255,g:255,b:255,alpha:0}}).png().toFile('assets/icon.png').then(()=>console.log('Icon diperbesar ke 1024x1024'))" "$ICON"
+            node -e "require('sharp')(process.argv[1]).resize(1024,1024,{fit:'contain',background:{r:255,g:255,b:255,alpha:0}}).png().toFile('assets/icon.png').then(()=>console.log('Icon diperbesar ke 1024x1024'))" "$ICON_FILE"
             npx capacitor-assets generate --android --iconBackgroundColor '#ffffff' --iconBackgroundColorDark '#ffffff'
           else
             echo "Icon tidak ditemukan, memakai icon bawaan"
+          fi
+
+      - name: Pakai kunci tanda tangan tetap (jika ada debug.keystore)
+        run: |
+          if [ -f debug.keystore ]; then
+            mkdir -p ~/.android
+            cp debug.keystore ~/.android/debug.keystore
+            echo "Memakai debug.keystore dari repo (APK bisa menimpa versi lama)"
+          else
+            echo "debug.keystore tidak ada; hapus aplikasi lama sebelum instal versi baru"
           fi
 
       - name: Bangun APK
@@ -56,9 +245,10 @@ jobs:
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
+          cp app/build/outputs/apk/debug/app-debug.apk "app/build/outputs/apk/debug/${SLUG}.apk"
 
       - name: Simpan APK
         uses: actions/upload-artifact@v4
         with:
-          name: AYOSO-apk
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: ${{ env.SLUG }}-apk
+          path: android/app/build/outputs/apk/debug/${{ env.SLUG }}.apk
